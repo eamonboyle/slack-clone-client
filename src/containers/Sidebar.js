@@ -1,5 +1,6 @@
 import React from 'react'
-import { gql, graphql } from 'react-apollo'
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag';
 import _ from 'lodash';
 import decode from 'jwt-decode';
 
@@ -18,7 +19,7 @@ const Sidebar = ({ data: { loading, allTeams }, currentTeamId }) => {
         const token = localStorage.getItem('token');
         const { user } = decode(token);
         username = user.username;
-    } catch (err) {}
+    } catch (err) { }
 
     return [
         <Teams

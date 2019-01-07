@@ -2,7 +2,8 @@ import React from 'react';
 import { extendObservable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Form, Container, Header, Input, Button, Message } from 'semantic-ui-react';
-import { graphql, gql } from 'react-apollo';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
 
 class CreateTeam extends React.Component {
