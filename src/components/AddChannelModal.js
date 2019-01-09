@@ -74,13 +74,12 @@ export default compose(
                 },
                 update: (store, { data: { createChannel } }) => {
                     const { ok, channel } = createChannel;
-
+                    
                     if (!ok) {
                         return;
                     }
 
                     const data = store.readQuery({ query: allTeamsQuery });
-                    console.log(data);
                     const teamIdx = findIndex(data.allTeams, ['id', teamId]);
                     data.allTeams[teamIdx].channels.push(channel);
                     store.writeQuery({ query: allTeamsQuery, data });
