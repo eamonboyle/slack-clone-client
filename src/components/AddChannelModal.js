@@ -16,9 +16,9 @@ const AddChannelModal = ({
     handleSubmit,
     isSubmitting
 }) => (
-        <Modal open={open} onClose={onClose}>
-            <Modal.Header>
-                Add Channel
+<Modal open={open} onClose={onClose}>
+        <Modal.Header>
+            Add Channel
         </Modal.Header>
             <Modal.Content>
                 <Form>

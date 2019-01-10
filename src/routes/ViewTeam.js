@@ -5,11 +5,11 @@ import { Redirect } from 'react-router-dom';
 
 import AppLayout from '../components/AppLayout';
 import Header from '../components/Header';
-import Messages from '../components/Messages';
 import SendMessage from '../components/SendMessage';
 import { allTeamsQuery } from '../graphql/team';
 
 import Sidebar from '../containers/Sidebar';
+import MessageContainer from '../containers/MessageContainer';
 
 const ViewTeam = ({ data: { loading, allTeams, inviteTeams }, match: { params: { teamId, channelId } } }) => {
 
@@ -41,13 +41,8 @@ const ViewTeam = ({ data: { loading, allTeams, inviteTeams }, match: { params: {
                 team={team}
             />
             {channel ? <Header channelName={channel.name} /> : null}
-            {channel && <Messages channelId={channel.id}>
-                <ul className="messages-list">
-                    <li></li>
-                    <li></li>
-                </ul>
-            </Messages>}
-            <SendMessage channelName={channel.name} />
+            {channel && <MessageContainer channelId={channel.id} />}
+            {channel && <SendMessage channelName={channel.name} channelId={channel.id} />}
         </AppLayout>
     );
 };
