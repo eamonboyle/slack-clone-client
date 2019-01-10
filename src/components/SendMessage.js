@@ -25,6 +25,7 @@ const SendMessage = ({ channelName, values, handleBlur, handleChange, handleSubm
             onKeyDown={(e) => {
                 if (e.keyCode === ENTER_KEY && !isSubmitting) {
                     handleSubmit(e);
+                    values.message = ''
                 }
             }}
         />
