@@ -12,7 +12,11 @@ import { meQuery } from '../graphql/team';
 import Sidebar from '../containers/Sidebar';
 import DirectMessageContainer from '../containers/DirectMessageContainer';
 
-const DirectMessages = ({ mutate, data: { loading, me }, match: { params: { teamId, userId } } }) => {
+const DirectMessages = ({
+    mutate,
+    data: { loading, me, getUser },
+    match: { params: { teamId, userId } },
+}) => {
 
     if (loading) {
         return null;
@@ -29,7 +33,6 @@ const DirectMessages = ({ mutate, data: { loading, me }, match: { params: { team
     const team = teamIdx === -1 ? teams[0] : teams[teamIdx];
 
     userId = parseInt(userId, 10);
-    teamId = parseInt(teamId, 10);
 
     return (
         <AppLayout>
@@ -41,16 +44,32 @@ const DirectMessages = ({ mutate, data: { loading, me }, match: { params: { team
                 team={team}
                 username={username}
             />
-            <Header channelName="Someone's username" />
-            <DirectMessageContainer teamId={teamId} userId={userId} />
+            <Header channelName={getUser.username} />
+            <DirectMessageContainer teamId={team.id} userId={userId} />
             <SendMessage
                 onSubmit={async (text) => {
                     const response = await mutate({
                         variables: {
                             text,
                             receiverId: userId,
-                            teamId
-                        }
+                            teamId: team.id
+                        },
+                        optimisticResponse: {
+                            createDirectMessage: true
+                        },
+                        update: (store) => {
+                            const data = store.readQuery({ query: meQuery });
+                            const teamIdx2 = findIndex(data.me.teams, ['id', team.id]);
+                            const notAlreadyThere = data.me.teams[teamIdx2].directMessageMembers.every(member => member.id !== parseInt(userId, 10));
+                            if (notAlreadyThere) {
+                                data.me.teams[teamIdx2].directMessageMembers.push({
+                                    __typename: 'User',
+                                    id: userId,
+                                    username: getUser.username,
+                                });
+                                store.writeQuery({ query: meQuery, data });
+                            }
+                        },
                     });
                     console.log(response);
                 }}
@@ -66,7 +85,37 @@ const createDirectMessageMutation = gql`
     }
 `;
 
+const directMessageMeQuery = gql`
+    query($userId: Int!) {
+        getUser(userId: $userId) {
+            username
+        }
+        me {
+            id
+            username
+            teams {
+                id
+                name
+                admin
+                directMessageMembers {
+                    id
+                    username
+                }
+                channels {
+                    id
+                    name
+                }
+            }
+        }
+    }
+`;
+
 export default compose(
-    graphql(meQuery, { options: { fetchPolicy: 'network-only' } }),
+    graphql(directMessageMeQuery, {
+        options: props => ({
+            variables: { userId: parseInt(props.match.params.userId, 10) },
+            fetchPolicy: 'network-only'
+        })
+    }),
     graphql(createDirectMessageMutation),
 )(DirectMessages);
