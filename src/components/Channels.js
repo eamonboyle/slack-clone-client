@@ -47,50 +47,52 @@ const channel = ({ id, name }, teamId) => (
     </Link>
 );
 
-const user = ({ id, name }) => (
-    <SideBarListItem key={`user-${id}`}>
-        <Bubble /> {name}
-    </SideBarListItem>
+const user = ({ id, username }, teamId) => (
+    <Link key={`user-${id}`} to={`/view-team/user/${teamId}/${id}`}>
+        <SideBarListItem>
+            <Bubble /> {username}
+        </SideBarListItem>
+    </Link>
 );
 
-export default ({ 
-    teamId, 
-    teamName, 
-    username, 
-    channels, 
-    users, 
-    onAddChannelClick, 
+export default ({
+    teamId,
+    teamName,
+    username,
+    channels,
+    users,
+    onAddChannelClick,
     onDirectMessageClick,
-    onInvitePeopleClick, 
-    isOwner 
+    onInvitePeopleClick,
+    isOwner
 }) => (
-    <ChannelWrapper>
-        <PushLeft>
-            <TeamNameHeader>{teamName}</TeamNameHeader>
-            {username}
-        </PushLeft>
-        <div>
-            <SideBarList>
-                <SideBarListHeader>
-                    Channels {isOwner ? <Icon onClick={onAddChannelClick} name="add circle" /> : null}
-                </SideBarListHeader>
-                {channels.map(c => channel(c, teamId))}
-            </SideBarList>
-        </div>
-        <div>
-            <SideBarList>
-                <SideBarListHeader>
-                    Direct Messages <Icon onClick={onDirectMessageClick} name="add circle" />
-                </SideBarListHeader>
-                {users.map(user)}
-            </SideBarList>
-        </div>
-        {isOwner &&
+        <ChannelWrapper>
+            <PushLeft>
+                <TeamNameHeader>{teamName}</TeamNameHeader>
+                {username}
+            </PushLeft>
             <div>
-                <a href="#invite-people" onClick={onInvitePeopleClick}>
-                    + invite people
-                </a>
+                <SideBarList>
+                    <SideBarListHeader>
+                        Channels {isOwner ? <Icon onClick={onAddChannelClick} name="add circle" /> : null}
+                    </SideBarListHeader>
+                    {channels.map(c => channel(c, teamId))}
+                </SideBarList>
             </div>
-        }
-    </ChannelWrapper>
-);
+            <div>
+                <SideBarList>
+                    <SideBarListHeader>
+                        Direct Messages <Icon onClick={onDirectMessageClick} name="add circle" />
+                    </SideBarListHeader>
+                    {users.map(u => user(u, teamId))}
+                </SideBarList>
+            </div>
+            {isOwner &&
+                <div>
+                    <a href="#invite-people" onClick={onInvitePeopleClick}>
+                        + invite people
+                </a>
+                </div>
+            }
+        </ChannelWrapper>
+    );
