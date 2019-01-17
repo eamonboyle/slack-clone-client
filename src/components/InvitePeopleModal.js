@@ -15,9 +15,13 @@ const InvitePeopleModal = ({
     handleSubmit,
     isSubmitting,
     touched,
-    errors
+    errors,
+    resetForm
 }) => (
-        <Modal open={open} onClose={onClose}>
+        <Modal open={open} onClose={(e) => {
+            resetForm();
+            onClose(e);
+        }}>
             <Modal.Header>
                 Add People to your Team
         </Modal.Header>
@@ -35,7 +39,10 @@ const InvitePeopleModal = ({
                     </Form.Field>
                     {touched.email && errors.email ? errors.email[0] : null}
                     <Form.Group widths="equal">
-                        <Button disabled={isSubmitting} fluid onClick={onClose}>Cancel</Button>
+                        <Button disabled={isSubmitting} fluid onClick={(e) => {
+                            resetForm();
+                            onClose(e);
+                        }}>Cancel</Button>
                         <Button disabled={isSubmitting} onClick={handleSubmit} fluid>Invite User</Button>
                     </Form.Group>
                 </Form>
@@ -70,7 +77,16 @@ export default compose(
                 setSubmitting(false);
             } else {
                 setSubmitting(false);
-                setErrors(normalizeErrors(errors));
+                // add new error code here
+                const errorsLength = errors.length;
+                const filteredErrors = errors.filter(e => e.message !== 'user_id must be unique');
+                if (errorsLength !== filteredErrors.length) {
+                    filteredErrors.push({
+                        path: 'email',
+                        message: 'This user is already part of the team'
+                    });
+                }
+                setErrors(normalizeErrors(filteredErrors));
             }
         },
     }),
